@@ -2,6 +2,9 @@
 
 #import <React/RCTBundleURLProvider.h>
 
+#import "TiktokV2-Bridging-Header.h"
+
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

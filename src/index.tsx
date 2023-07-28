@@ -17,6 +17,6 @@ const TiktokV2 = NativeModules.TiktokV2
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return TiktokV2.multiply(a, b);
+export function auth(a: number, b: number): Promise<number> {
+  return TiktokV2.auth(a, b);
 }
