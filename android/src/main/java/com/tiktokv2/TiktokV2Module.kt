@@ -20,9 +20,9 @@ class TiktokV2Module(reactContext: ReactApplicationContext) :
   private lateinit var authApi: AuthApi
   private lateinit var redirectUri: String
   private lateinit var clientKey: String
+  private lateinit var codeVerifier: String
 
   private val mReactContext = reactContext
-  private val codeVerifier = PKCEUtils.generateCodeVerifier()
 
   override fun getName(): String {
     return NAME
@@ -40,6 +40,7 @@ class TiktokV2Module(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun auth(scopes: String, redirectUri: String, promise: Promise) {
     this.authApi = this.mReactContext.currentActivity?.let { AuthApi(activity = it) }!!
+    this.codeVerifier = PKCEUtils.generateCodeVerifier()
 
     // redirectUri in Android should not have "/" at the end of string.
     if (redirectUri.last() == '/') {
@@ -68,7 +69,7 @@ class TiktokV2Module(reactContext: ReactApplicationContext) :
       val result: WritableMap = Arguments.createMap()
       result.putInt("errorCode", it.errorCode)
       result.putString("authCode", it.authCode)
-      result.putString("codeVerifier", codeVerifier)
+      result.putString("codeVerifier", this.codeVerifier)
       result.putString("errorMsg", it.authErrorDescription)
 
       this.mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)

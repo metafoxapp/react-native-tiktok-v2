@@ -5,6 +5,7 @@ import TikTokOpenAuthSDK
 @objc(TiktokV2)
 class TiktokV2: NSObject {
   var resolve : RCTPromiseResolveBlock? = nil;
+  private var authRequest: TikTokAuthRequest?
 
   @objc
     func auth(_ scopes: NSString,
@@ -16,26 +17,34 @@ class TiktokV2: NSObject {
 
       let scopesArray:Array = scopes.components(separatedBy: ",");
       var setScopes: Set<String> = [];
-      let dict = NSMutableDictionary();
+
 
       for index in 0 ..< scopesArray.count {
         setScopes.insert(scopesArray[index])
       }
 
-      let authRequest = TikTokAuthRequest(scopes: setScopes, redirectURI:redirectUri as String)
+      let authRequest: TikTokAuthRequest = TikTokAuthRequest(scopes: setScopes, redirectURI:redirectUri as String)
       authRequest.isWebAuth = false
+      self.authRequest = authRequest
 
       DispatchQueue.main.sync {
         authRequest.send { response in
           guard let authResponse = response as? TikTokAuthResponse else { return }
-          dict.setValue(authResponse.errorCode.rawValue, forKey:"errorCode")
-          dict.setValue(authResponse.errorDescription, forKey:"errorMsg")
-          dict.setValue(authResponse.authCode, forKey:"authCode")
-          dict.setValue(scopes, forKey:"grantedPermissions")
-          dict.setValue(authRequest.pkce.codeVerifier, forKey:"codeVerifier")
-          dict.setValue(redirectUri, forKey:"redirectUri")
-          self.resolve?(dict)
+          self.handleAuthResponse(authResponse)
         }
       }
+    }
+
+    func handleAuthResponse(_ response: TikTokAuthResponse) {
+      guard let request = self.authRequest else { return }
+
+      let dict = NSMutableDictionary();
+      dict.setValue(response.errorCode.rawValue, forKey:"errorCode")
+      dict.setValue(response.errorDescription, forKey:"errorMsg")
+      dict.setValue(response.authCode, forKey:"authCode")
+      dict.setValue(request.pkce.codeVerifier, forKey:"codeVerifier")
+
+      self.resolve?(dict)
+      self.authRequest = nil
     }
 }
