@@ -87,6 +87,7 @@ android {
 repositories {
   mavenCentral()
   google()
+  maven { url "https://artifact.bytedance.com/repository/AwemeOpenSDK" }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -97,6 +98,10 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+  implementation 'com.tiktok.open.sdk:tiktok-open-sdk-core:2.0.2'
+  implementation 'com.tiktok.open.sdk:tiktok-open-sdk-auth:2.0.2'   // to use authorization api
+  implementation 'com.tiktok.open.sdk:tiktok-open-sdk-share:2.0.2'    // to use share api
 }
 
 if (isNewArchitectureEnabled()) {
