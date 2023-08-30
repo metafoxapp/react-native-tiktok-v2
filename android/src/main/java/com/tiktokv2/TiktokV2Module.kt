@@ -65,17 +65,19 @@ class TiktokV2Module(reactContext: ReactApplicationContext) :
   override fun onActivityResult(p0: Activity?, p1: Int, p2: Int, p3: Intent?) {}
 
   override fun onNewIntent(intent: Intent?) {
-    this.authApi.getAuthResponseFromIntent(intent, this.redirectUri)?.let {
-      val result: WritableMap = Arguments.createMap()
-      result.putInt("errorCode", it.errorCode)
-      result.putString("authCode", it.authCode)
-      result.putString("codeVerifier", this.codeVerifier)
-      result.putString("errorMsg", it.authErrorDescription)
+      if (this::authApi.isInitialized) {
+        this.authApi.getAuthResponseFromIntent(intent, this.redirectUri)?.let {
+          val result: WritableMap = Arguments.createMap()
+          result.putInt("errorCode", it.errorCode)
+          result.putString("authCode", it.authCode)
+          result.putString("codeVerifier", this.codeVerifier)
+          result.putString("errorMsg", it.authErrorDescription)
 
-      this.mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-        .emit("onAuthCompleted", result)
+          this.mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit("onAuthCompleted", result)
+        }
+      }
     }
-  }
 
   companion object {
     const val NAME = "TiktokV2"
